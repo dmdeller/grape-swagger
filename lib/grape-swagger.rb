@@ -75,6 +75,12 @@ module Grape
           # get the parent route for the namespace
           parent_route_name = name.match(%r{^/?([^/]*).*$})[1]
           parent_route = @target_class.combined_routes[parent_route_name]
+          
+          if parent_route.nil?
+            print "[grape-swagger] ERROR: No parent route: #{parent_route_name} for namespace: #{name}\n"
+            next
+          end
+          
           # fetch all routes that are within the current namespace
           namespace_routes = parent_route.collect do |route|
             route if (route.route_path.start_with?(route.route_prefix ? "/#{route.route_prefix}/#{name}" : "/#{name}") || route.route_path.start_with?((route.route_prefix ? "/#{route.route_prefix}/:version/#{name}" : "/:version/#{name}"))) &&
